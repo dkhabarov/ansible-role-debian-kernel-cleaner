@@ -1,0 +1,30 @@
+---
+- name: install git
+  apt:
+    pkg: git
+  tags:
+    - debian_kernel_cleaner_install_git
+
+- name: clone script from github
+  git:
+    repo: https://github.com/dkhabarov/debian-kernel-cleaner.git
+    dest: /opt/debian-kernel-cleaner
+    update: yes
+    force: yes
+  tags:
+    - debian_kernel_cleaner_clone
+
+- name: starting cleaner
+  command: "/opt/debian-kernel-cleaner/debian-kernel-cleaner.sh"
+  tags:
+    - run_debian_kernel_cleaner
+
+- name: add crontab task
+  cron: 
+    name: "run debian-kernel-cleaner"
+    special_time: "daily"
+    cron_file: "debian-kernel-cleaner"
+    user: root
+    job: "[ -x /opt/debian-kernel-cleaner/debian-kernel-cleaner.sh ] && /opt/debian-kernel-cleaner/debian-kernel-cleaner.sh >/dev/null 2>&1"
+  tags:
+    - debian_kernel_cleaner_add_crontask
